@@ -53,7 +53,7 @@ def do_work(sender, event):
     formConvert.Text = str('0%')
     filename = inspect.getframeinfo(inspect.currentframe()).filename
     path_dirname_ = os.path.dirname(os.path.abspath(filename)).replace("\\venv\\MyOfficeScripts", u"\\шаблоны")
-
+    print "hello"
     mydir0 = textboxBrowse.Text + "\\" + u"Ошибки"
     mydir1 = textboxBrowse.Text + "\\" + u"Результаты"
     mydir2 = textboxBrowse.Text + "\\" + u"Грамоты"
