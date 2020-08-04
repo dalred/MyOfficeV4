@@ -4,8 +4,6 @@ from MyOfficeSDKDocumentAPI import DocumentAPI as sdk
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
-
-
 def main__(worker, folderName,mydirs_):
     def message_lose(table, i):
         last_name = table.getCell("B" + str(i)).getFormattedValue()

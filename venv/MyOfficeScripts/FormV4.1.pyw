@@ -49,7 +49,6 @@ def del_(sender, e):
 
 def do_work(sender, event):
     time.sleep(0.5)
-
     formConvert.Text = str('0%')
     filename = inspect.getframeinfo(inspect.currentframe()).filename
     path_dirname_ = os.path.dirname(os.path.abspath(filename)).replace("\\venv\\MyOfficeScripts", u"\\шаблоны")

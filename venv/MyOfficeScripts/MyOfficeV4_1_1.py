@@ -8,7 +8,6 @@ from string import ascii_uppercase
 
 
 
-
 def log_file(filename, cell, is_first_error, log):
     if is_first_error:
         log.append(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + " Ошибка в файле: " + " " + filename.encode(
