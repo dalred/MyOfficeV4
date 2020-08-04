@@ -16,6 +16,7 @@ from System.ComponentModel import BackgroundWorker
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
+
 formConvert = Form()
 progressbar1 = ProgressBar()
 combobox1 = ComboBox()
@@ -266,6 +267,14 @@ def show_form():
     label1.TextAlign = ContentAlignment.MiddleLeft
     label1.UseCompatibleTextRendering = True
     #
+    labeldata = Label()
+    labeldata.Location = Point(12, 109)
+    labeldata.Name = 'labeldata'
+    labeldata.Size = Size(185, 20)
+    labeldata.TabIndex = 8
+    labeldata.Text = u'Дата проведения конкурса:'
+    labeldata.TextAlign = 'MiddleLeft'
+    labeldata.UseCompatibleTextRendering = True
     # TextBox Путь
     textboxBrowse.Location = Point(95, 69)
     textboxBrowse.Name = 'textboxBrowse'
@@ -286,6 +295,7 @@ def show_form():
     formConvert.Controls.Add(label1)
     formConvert.Controls.Add(buttonbrowse)
     formConvert.Controls.Add(textboxBrowse)
+    formConvert.Controls.Add(labeldata)
     Application.Run(formConvert)
 
 
