@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from re import compile
+import Tkinter
+import tkFileDialog
 import os, sys, time, inspect, clr,datetime
 from dateutil.relativedelta import relativedelta
 from MyOfficeV4_1_2 import main_
@@ -160,13 +162,22 @@ def begin_dfile(sender, event):
 
 
 def show_dialog(sender, event):
-    folderBrowserDialog1 = FolderBrowserDialog()
+    root = Tkinter.Tk()
+    root.withdraw()
+    folderName = tkFileDialog.askdirectory(initialdir="/",mustexist=1,title='Пожалуйста укажите корневой каталог: ')
+    if folderName:
+        textboxBrowse.Text = folderName
+    else:
+        textboxBrowse.Text = 'folder not specified'
+
+    """folderBrowserDialog1 = FolderBrowserDialog()
     folderBrowserDialog1.RootFolder = 17
     if folderBrowserDialog1.ShowDialog() == 1:
         folderName = folderBrowserDialog1.SelectedPath
         textboxBrowse.Text = folderName
     else:
-        textboxBrowse.Text = 'folder not specified'
+        textboxBrowse.Text = 'folder not specified'"""
+    formConvert.Focus()
 
 worker.DoWork += do_work
 worker.ProgressChanged += bgWorker_ProgressChanged
