@@ -158,10 +158,12 @@ def write_table(all_str_sorted_lst,worker):
         index = str(current_row - 3) # 1
         str_choice = str(choice(['да', 'нет']))
         row_str = str(current_row)  # 4
+
         table_output_xlsx.getCell("E" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
         table_output_xlsx_2.getCell("B" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
         # A4 set text 1
         k = 1  # Начинаем с B
+        print "str_", str_
         #print "str", str_[0]
         for s in str_:
             # print "Столбец ", column, " Строка ", row_str
