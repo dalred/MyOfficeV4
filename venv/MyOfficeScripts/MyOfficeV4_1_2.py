@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from re import compile
-import os, time,itertools
+from dateutil.relativedelta import relativedelta
+import os, time,itertools,datetime
 from random import choice
-from datetime import datetime
 from MyOfficeSDKDocumentAPI import DocumentAPI as sdk
 from string import ascii_uppercase
 
@@ -39,31 +39,31 @@ def extract_txt_doc(filename, path,folderName):
     document_xls_input = application.loadDocument(path)
     table_input = document_xls_input.getBlocks().getTable(0)
 
-    last_name = table_input.getCell('C6').getFormattedValue()
-    first_name = table_input.getCell('C8').getFormattedValue()
-    middle_name = table_input.getCell('C10').getFormattedValue()
+    last_name = table_input.getCell('C6').getRawValue()
+    first_name = table_input.getCell('C8').getRawValue()
+    middle_name = table_input.getCell('C10').getRawValue()
 
     date_birth = table_input.getCell('C12').getFormattedValue()
-    country = table_input.getCell('C14').getFormattedValue()
-    district = table_input.getCell('C15').getFormattedValue()
-    post_index = table_input.getCell('C16').getFormattedValue()
-    region = table_input.getCell('C18').getFormattedValue()
-    city = table_input.getCell('C20').getFormattedValue()
-    #address = table_input.getCell('C22').getFormattedValue()
-    school = table_input.getCell('C22').getFormattedValue()
-    school_address = table_input.getCell('C24').getFormattedValue()
-    exp = table_input.getCell('C26').getFormattedValue()
-    cert_1 = table_input.getCell('C27').getFormattedValue()
-    cert_2 = table_input.getCell('C28').getFormattedValue()
-    cert_3 = table_input.getCell('C29').getFormattedValue()
+    country = table_input.getCell('C14').getRawValue()
+    district = table_input.getCell('C15').getRawValue()
+    post_index = table_input.getCell('C16').getRawValue()
+    region = table_input.getCell('C18').getRawValue()
+    city = table_input.getCell('C20').getRawValue()
+    #address = table_input.getCell('C22').getRawValue()
+    school = table_input.getCell('C22').getRawValue()
+    school_address = table_input.getCell('C24').getRawValue()
+    exp = table_input.getCell('C26').getRawValue()
+    cert_1 = table_input.getCell('C27').getRawValue()
+    cert_2 = table_input.getCell('C28').getRawValue()
+    cert_3 = table_input.getCell('C29').getRawValue()
 
-    phone = table_input.getCell('C30').getFormattedValue()
-    email = table_input.getCell('C32').getFormattedValue()
+    phone = table_input.getCell('C30').getRawValue()
+    email = table_input.getCell('C32').getRawValue()
 
-    parent_fio = table_input.getCell('C34').getFormattedValue()
-    parent_email = table_input.getCell('C38').getFormattedValue()
-    parent_phone = table_input.getCell('C40').getFormattedValue()
-    parent_work = table_input.getCell('C42').getFormattedValue()
+    parent_fio = table_input.getCell('C34').getRawValue()
+    parent_email = table_input.getCell('C38').getRawValue()
+    parent_phone = table_input.getCell('C40').getRawValue()
+    parent_work = table_input.getCell('C42').getRawValue()
 
 
     #Раскрашиваем ячейки в анкетах с ошибками
@@ -148,16 +148,20 @@ def list_xls(rang):
             break
     return lst_addr
 
-def write_table(all_str_sorted_lst,worker):
+def write_table(all_str_sorted_lst,worker,datetime1_end):
     print "Запись данных."
     worker.ReportProgress(93, u"Запись данных.")
     current_row = 4
     column = list_xls("W")
 
     for str_ in all_str_sorted_lst:
+        datetime_birth=convert_time(str_[3])
+        time_difference = relativedelta(datetime1_end, datetime_birth)
+        difference_in_years = time_difference.years
         index = current_row - 3 # 1
         str_choice = str(choice(['да', 'нет']))
         row_str = str(current_row)  # 4
+        table_output_xlsx.getCell("H" + row_str).setText(str(difference_in_years))
         table_output_xlsx.getCell("E" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
         table_output_xlsx_2.getCell("B" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
 
@@ -254,13 +258,19 @@ for c in cell_range_borders:
     c.setBorders(borders_proper) """ # Формат границ
 
 
-
+def convert_time(date_):
+    date_str = date_.replace("/", ".").split(".")
+    mounth_str = int(date_str[0])
+    day_str = int(date_str[1])
+    year_str = int(date_str[2])
+    datetime_end = datetime.date(year_str, mounth_str, day_str)
+    return datetime_end
 
 application=None
 document_xls=None
 
 
-def main_(worker, folderName,mydirs_):
+def main_(worker, folderName,mydirs_,date_end):
     global application
     application = sdk.Application()
     global document_xls
@@ -304,7 +314,7 @@ def main_(worker, folderName,mydirs_):
     for i in range(0, len(all_str_sorted_lst)):   #от 0 до len записей
         p = len(error_index)
         for v in all_str_sorted_lst[i]:
-             if not v:
+            if not v:
                  error_index.append(i + 1)
         if len(error_index) > p:
             error_files_count += 1
@@ -324,7 +334,9 @@ def main_(worker, folderName,mydirs_):
     number_rows = str(table_output_xlsx.getRowsCount())
     print "Количество строк в документе: ", number_rows
     # Записываем результат в таблицу
-    write_table(all_str_sorted_lst, worker)
+    #datetime1_end=convert_date(111)
+    date_end=convert_time(date_end)
+    write_table(all_str_sorted_lst, worker,date_end)
     set_cells_format(number_rows, worker)
     write_formules(worker, table_output_xlsx.getRowsCount())
     error_data(error_index, worker)

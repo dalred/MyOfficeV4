@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from re import compile
-import Tkinter
-import tkFileDialog
-import os, sys, time, inspect, clr,datetime
+from datetime import date
+import os, sys, time, inspect, clr,datetime,tkFileDialog,Tkinter
 from dateutil.relativedelta import relativedelta
 from MyOfficeV4_1_2 import main_
 from Results_v3_2 import main__
 from Scores import main_score
+clr.AddReference('System')
+from System import DateTime as NetDateTime
 clr.AddReference('System.Threading.Thread')
 from System.Threading import Thread, ThreadStart,ApartmentState
 clr.AddReference('System.Windows.Forms')
@@ -27,7 +28,7 @@ textboxBrowse = TextBox()
 start = Button()
 canceling = Button()
 worker = BackgroundWorker()
-datetextbox = TextBox()
+datetimepicker1=DateTimePicker()
 worker.WorkerReportsProgress = True
 worker.WorkerSupportsCancellation = True
 textboxBrowse.Text = "D:\Tests\profiles\Тестовая папка".decode('utf-8')
@@ -53,16 +54,11 @@ def del_(sender, e):
         print mydirs_[i]
         delete_file(mydirs_[i])"""
 
-def date_years():
-    datetime1 = datetime.date(year_str, mounth_str, day_str)
-    datetime2 = datetextbox.Text
-    date_str = datetime2.split(".")
-    day_str = int(date_str[0])
-    mounth_str = int(date_str[1])
-    year_str = int(date_str[2])
 
 def do_work(sender, event):
     time.sleep(0.5)
+    #date_end = datetextbox.Text
+    date_end=datetimepicker1.Value.ToString("MM.dd.yyyy")
     formConvert.Text = str('0%')
     mydir0 = textboxBrowse.Text + "\\" + u"Ошибки"
     mydir1 = textboxBrowse.Text + "\\" + u"Результаты"
@@ -106,7 +102,7 @@ def do_work(sender, event):
                     sender.CancelAsync()
                     sender.Dispose()
                     return
-        main_(sender, foldername,mydirs_)
+        main_(sender, foldername,mydirs_,date_end)
     elif combobox1.SelectedIndex == 1:
         main_score(sender, mydirs_)
     elif combobox1.SelectedIndex == 2:
@@ -300,14 +296,15 @@ def show_form():
     textboxBrowse.Name = 'textboxBrowse'
     textboxBrowse.Size = Size(310, 20)
     textboxBrowse.TabIndex = 6
+    textboxBrowse.ReadOnly = True
     # TextboxDate
-    datetextbox.BorderStyle = BorderStyle.FixedSingle
+    """datetextbox.BorderStyle = BorderStyle.FixedSingle
     datetextbox.Location = Point(220, 107)
     datetextbox.Name = 'datetextbox'
     datetextbox.Size = Size(185, 20)
     datetextbox.TabIndex = 7
     datetextbox.TextAlign =  HorizontalAlignment.Left
-    datetextbox.Text=datetime.datetime.now().date().strftime('%d.%m.%Y')
+    datetextbox.Text='19.01.2021'"""
     #
     picturebox1=PictureBox()
     picturebox1.Location = Point(330, 5)
@@ -317,8 +314,17 @@ def show_form():
     picturebox1.TabIndex = 9
     picturebox1.TabStop = False
     picturebox1.Image = Image.FromFile(path_dir_root+"post_logo.png")
+    #
+    #
 
-    textboxBrowse.ReadOnly = True
+    datetimepicker1.Format = DateTimePickerFormat.Short
+    datetimepicker1.Location = Point(220, 107)
+    datetimepicker1.Name = 'datetimepicker1'
+    datetimepicker1.Size = Size(183, 20)
+    datetimepicker1.TabIndex = 10
+    datetimepicker1.Value=NetDateTime(2021, 01, 19)
+
+    #
     # ControlsAdd
     formConvert.BringToFront()
     formConvert.Focus()
@@ -331,7 +337,8 @@ def show_form():
     formConvert.Controls.Add(buttonbrowse)
     formConvert.Controls.Add(textboxBrowse)
     formConvert.Controls.Add(labeldata)
-    formConvert.Controls.Add(datetextbox)
+    #formConvert.Controls.Add(datetextbox)
+    formConvert.Controls.Add(datetimepicker1)
     formConvert.Controls.Add(picturebox1)
     Application.Run(formConvert)
 
