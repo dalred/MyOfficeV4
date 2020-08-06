@@ -154,18 +154,19 @@ def write_table(all_str_sorted_lst,worker,datetime1_end):
     worker.ReportProgress(93, u"Запись данных.")
     current_row = 4
     column = list_xls("W")
+    regex_date = compile('^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$') #mm/dd/year
     for str_ in all_str_sorted_lst:
         index = current_row - 3  # 1
         str_choice = str(choice(['да', 'нет']))
         row_str = str(current_row)  # 4
-        if  str_[3]=='':
-            pass
-        else:
+        if  regex_date.match(str_[3]):
             datetime_birth = convert_time(str_[3])
             time_difference = relativedelta(datetime1_end, datetime_birth)
             difference_in_years = time_difference.years
             table_output_xlsx.getCell("H" + row_str).setText(str(difference_in_years))
-
+        else:
+            print "Неверный формат даты"
+            pass
         table_output_xlsx.getCell("E" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
         table_output_xlsx_2.getCell("B" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
 
