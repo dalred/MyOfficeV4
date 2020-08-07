@@ -14,6 +14,7 @@ clr.AddReference('System.Drawing')
 from System.Windows.Forms import *
 from System.Drawing import *
 from System.ComponentModel import BackgroundWorker
+from System.Diagnostics import Process
 #https://docs.microsoft.com/ru-ru/dotnet/api/system.componentmodel.backgroundworker?view=netcore-3.1
 
 
@@ -29,6 +30,7 @@ start = Button()
 canceling = Button()
 worker = BackgroundWorker()
 datetimepicker1=DateTimePicker()
+open = Button()
 worker.WorkerReportsProgress = True
 worker.WorkerSupportsCancellation = True
 textboxBrowse.Text = "D:\Tests\profiles\Тестовая папка".decode('utf-8')
@@ -36,7 +38,7 @@ mydir=textboxBrowse.Text
 filename = inspect.getframeinfo(inspect.currentframe()).filename
 path_dir_root=os.path.dirname(os.path.abspath(filename)).replace("venv\MyOfficeScripts", "")
 path_dirname_ = os.path.dirname(os.path.abspath(filename)).replace("\\venv\\MyOfficeScripts", u"\\шаблоны")
-
+state_dir = True
 
 mydir0 = mydir + "\\" + u"Ошибки"
 mydir1 = mydir + "\\" + u"Результаты"
@@ -72,7 +74,6 @@ def do_work(sender, event):
     time.sleep(0.5)
     date_end=datetimepicker1.Value.ToString("MM.dd.yyyy")
     formConvert.Text = str('0%')
-
     for i in range(3, 11):
         if not (os.path.exists(mydirs_[i])):
             raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i])) #Папку Анкеты тоже проверяем.
@@ -116,7 +117,6 @@ def bgWorker_ProgressChanged(sender, event):
         canceling.Enabled=False
 
 
-
 def final(sender,event):
     if event.Error <> None:
         print "Error: ", event.Error.Message
@@ -135,11 +135,9 @@ def final(sender,event):
 
 
 def begin_dfile(sender, event):
-    state_dir = True
     start.Enabled = False
     #???foldername = textboxBrowse.Text
     if textboxBrowse.Text == 'folder not specified':
-        state_dir = False
         MessageBox.Show('folder not specified', u"Предупреждение", MessageBoxButtons.OK, MessageBoxIcon.Warning)
     elif combobox1.SelectedIndex == 0 and state_dir is True:
         worker.RunWorkerAsync()
@@ -151,6 +149,9 @@ def begin_dfile(sender, event):
         worker.RunWorkerAsync()
         Application.UseWaitCursor = True
 
+def click_open(sender,event):
+    if state_dir:
+        Process.Start("explorer.exe", textboxBrowse.Text)
 
 
 def show_dialog(sender, event):
@@ -158,23 +159,20 @@ def show_dialog(sender, event):
     root.withdraw()
     folderName = tkFileDialog.askdirectory(initialdir="/",mustexist=1,title='Пожалуйста укажите корневой каталог: ')
     if folderName:
+        open.Enabled = True
+        global state_dir
+        state_dir= True
         global mydirs_
-        textboxBrowse.Text = folderName
+        textboxBrowse.Text = folderName.replace("/","\\")
         mydirs__ = []
         for i in range(0, 15):
-            mydirs__.append(mydirs_[i].replace(mydir,textboxBrowse.Text))
-        mydirs_ = mydirs__ #Без глобал невозможно сделать присвоение статическому полю. Использовать можно, но изменять нет.
-
+            mydirs__.append((mydirs_[i].replace(mydir,textboxBrowse.Text)))
+        mydirs_ = mydirs__ #Без глобал невозможно сделать присвоение статическому полю, так как ты его до этого не объявил.
+                            # Использовать можно, но изменять нет.
     else:
         textboxBrowse.Text = 'folder not specified'
-
-    """folderBrowserDialog1 = FolderBrowserDialog()
-    folderBrowserDialog1.RootFolder = 17
-    if folderBrowserDialog1.ShowDialog() == 1:
-        folderName = folderBrowserDialog1.SelectedPath
-        textboxBrowse.Text = folderName
-    else:
-        textboxBrowse.Text = 'folder not specified'"""
+        state_dir == False
+        open.Enabled=False
     formConvert.Focus()
 
 worker.DoWork += do_work
@@ -185,24 +183,11 @@ worker.RunWorkerCompleted += final
 
 def show_form():
     formConvert.StartPosition = FormStartPosition.CenterScreen
-    formConvert.ClientSize = Size(417, 252)
+    formConvert.ClientSize = Size(452, 245)
     formConvert.FormBorderStyle = FormBorderStyle.FixedToolWindow
     formConvert.Name = 'formConvert'
+    formConvert.BackColor = SystemColors.ButtonFace
     formConvert.Text = 'Форма для конвертации'.decode('utf8')
-
-    #
-    # clear
-    #
-    clear = Button()
-    clear.Location = Point(314, 235)
-    clear.Name = 'clear'
-    clear.Size = Size(91, 40)
-    clear.TabIndex = 0
-    clear.Click += del_
-    clear.Text = 'Очистка'.decode('utf-8')
-    clear.UseCompatibleTextRendering = True
-    clear.UseVisualStyleBackColor = True
-    #
     #
     # start
     #
@@ -217,21 +202,31 @@ def show_form():
     start.UseVisualStyleBackColor = True
     #
     ## Cancel
-    canceling.Location = Point(225, 210)
+    canceling.Location = Point(333, 210)
     canceling.Name = 'canceling'
-    canceling.Size = Size(180, 30)
+    canceling.Size = Size(110, 30)
     canceling.TabIndex = 0
     canceling.Text = 'Отмена'.decode('utf-8')
     canceling.UseCompatibleTextRendering = True
     canceling.UseVisualStyleBackColor = True
     canceling.Click += Cancel_
     #
+    #open
+    open.ImageAlign=ContentAlignment.MiddleCenter
+    open.Location = Point(95, 79)
+    open.Name = 'open'
+    open.Size = Size(32, 27)
+    open.TabIndex = 12
+    open.UseCompatibleTextRendering = True
+    open.UseVisualStyleBackColor = True
+    open.Image = Image.FromFile(path_dir_root + "Open-folder-full.png")
+    open.Click+=click_open
     #
-    #
+    #buttonbrowse
     buttonbrowse = Button()
-    buttonbrowse.Location = Point(12, 83)
+    buttonbrowse.Location = Point(12, 79)
     buttonbrowse.Name = 'buttonbrowse'
-    buttonbrowse.Size = Size(77, 20)
+    buttonbrowse.Size = Size(77, 27)
     buttonbrowse.TabIndex = 5
     buttonbrowse.Text = u'Обзор'
     buttonbrowse.Click += show_dialog
@@ -240,10 +235,10 @@ def show_form():
     #
     # ProgressBar
     #
-
+    #
     progressbar1.Location = Point(12, 170)
     progressbar1.Name = 'progressbar1'
-    progressbar1.Size = Size(393, 34)
+    progressbar1.Size = Size(431, 34)
     progressbar1.Step = 1
     progressbar1.TabIndex = 1
     progressbar1.Value = 0
@@ -257,7 +252,7 @@ def show_form():
     combobox1.Items.Add(u'1. Обработка Анкет')
     combobox1.Items.Add(u'2. Подсчет балов')
     combobox1.Items.Add(u'3. Формирование грамот и писем')
-    combobox1.Location = Point(220, 133)
+    combobox1.Location = Point(258, 143)
     combobox1.Name = 'combobox1'
     combobox1.Size = Size(185, 21)
     combobox1.TabIndex = 2
@@ -267,7 +262,7 @@ def show_form():
     #
     #label Этап
     label = Label()
-    label.Location = Point(12, 133)
+    label.Location = Point(12, 142)
     label.Name = 'label'
     label.Size = Size(202, 22)
     label.TabIndex = 3
@@ -277,7 +272,7 @@ def show_form():
     #
     #Путь к размещению файлов
     label1 = Label()
-    label1.Location = Point(12, 49)
+    label1.Location = Point(12, 45)
     label1.Name = 'label1'
     label1.Size = Size(150, 31)
     label1.TabIndex = 4
@@ -294,15 +289,16 @@ def show_form():
     labeldata.TextAlign = ContentAlignment.MiddleLeft
     labeldata.UseCompatibleTextRendering = True
     # TextBox Путь
-    textboxBrowse.Location = Point(95, 83)
+    textboxBrowse.Location = Point(133, 79)
     textboxBrowse.Name = 'textboxBrowse'
-    textboxBrowse.Size = Size(310, 20)
+    textboxBrowse.Size = Size(310, 27)
+    textboxBrowse.Multiline = True
     textboxBrowse.TabIndex = 6
     textboxBrowse.ReadOnly = True
     #
     #picturebox
     picturebox1=PictureBox()
-    picturebox1.Location = Point(330, 5)
+    picturebox1.Location = Point(368, 4)
     picturebox1.Name = 'picturebox1'
     picturebox1.Size = Size(75, 72)
     picturebox1.SizeMode = PictureBoxSizeMode.CenterImage
@@ -313,7 +309,7 @@ def show_form():
     #
     #datetimepicker1
     datetimepicker1.Format = DateTimePickerFormat.Short
-    datetimepicker1.Location = Point(220, 107)
+    datetimepicker1.Location = Point(260, 117)
     datetimepicker1.Name = 'datetimepicker1'
     datetimepicker1.Size = Size(183, 20)
     datetimepicker1.TabIndex = 10
@@ -334,6 +330,7 @@ def show_form():
     formConvert.Controls.Add(labeldata)
     formConvert.Controls.Add(datetimepicker1)
     formConvert.Controls.Add(picturebox1)
+    formConvert.Controls.Add(open)
     Application.Run(formConvert)
 
 

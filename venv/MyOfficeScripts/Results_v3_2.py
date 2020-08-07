@@ -30,6 +30,7 @@ def main__(worker, folderName,mydirs_):
 
 
     input_xls = (folderName + "\\"+os.path.basename(mydirs_[3])).encode('utf-8')
+
     template_win_doc = mydirs_[6].encode('utf-8')
     template_lose_doc = mydirs_[5].encode('utf-8')
     template_paper_win_doc = mydirs_[4].encode('utf-8')
@@ -55,8 +56,8 @@ def main__(worker, folderName,mydirs_):
             worker.ReportProgress(percentage, u"Отмена задания")
             time.sleep(1)
             return
-        if table.getCell("AC" + str(i)).getFormattedValue() == 'да':
+        if table.getCell("AL" + str(i)).getFormattedValue() == 'да':
             message_win(table, i)
             paper_win(table, i)
-        elif table.getCell("AC" + str(i)).getFormattedValue() == 'нет':
+        elif table.getCell("AL" + str(i)).getFormattedValue() == 'нет':
             message_lose(table, i)

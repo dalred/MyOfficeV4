@@ -154,7 +154,8 @@ def write_table(all_str_sorted_lst,worker,datetime1_end):
     worker.ReportProgress(93, u"Запись данных.")
     current_row = 4
     column = list_xls("W")
-    regex_date = compile('^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$') #mm/dd/year
+    # В разработке =TRUNC(DAYS(G4; F4)/365,242199; 0)
+    regex_date = compile('^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$') #mm/dd/year 06/16/1990
     for str_ in all_str_sorted_lst:
         index = current_row - 3  # 1
         str_choice = str(choice(['да', 'нет']))
@@ -165,7 +166,7 @@ def write_table(all_str_sorted_lst,worker,datetime1_end):
             difference_in_years = time_difference.years
             table_output_xlsx.getCell("H" + row_str).setText(str(difference_in_years))
         else:
-            print "Неверный формат даты"
+            #print "Неверный формат даты, index записи: ", index
             pass
         table_output_xlsx.getCell("E" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
         table_output_xlsx_2.getCell("B" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
