@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from re import compile
-from datetime import date
 import os, sys, time, inspect, clr,datetime,tkFileDialog,Tkinter
 from dateutil.relativedelta import relativedelta
-from MyOfficeV4_1_2 import main_
+from MyOfficeV4_1_2_1 import main_
 from Results_v3_2 import main__
 from Scores import main_score
 clr.AddReference('System')
@@ -16,6 +15,7 @@ from System.Windows.Forms import *
 from System.Drawing import *
 from System.ComponentModel import BackgroundWorker
 #https://docs.microsoft.com/ru-ru/dotnet/api/system.componentmodel.backgroundworker?view=netcore-3.1
+
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -32,17 +32,12 @@ datetimepicker1=DateTimePicker()
 worker.WorkerReportsProgress = True
 worker.WorkerSupportsCancellation = True
 textboxBrowse.Text = "D:\Tests\profiles\Тестовая папка".decode('utf-8')
-mydirs_=[]
+
+mylist="D:\Tests\profiles\Тестовая папка2"
+
 filename = inspect.getframeinfo(inspect.currentframe()).filename
 path_dir_root=os.path.dirname(os.path.abspath(filename)).replace("venv\MyOfficeScripts", "")
 path_dirname_ = os.path.dirname(os.path.abspath(filename)).replace("\\venv\\MyOfficeScripts", u"\\шаблоны")
-
-def delete_file(dir_):
-    """filter=[os.os.path.join(folder_url, f) for f in os.listdir(folder_url) if f <> u"Анкеты"]
-    for dir in filter:
-        print dir
-        time.sleep(0.1)
-        remove(dir)"""
 
 
 
@@ -79,7 +74,7 @@ def do_work(sender, event):
     mydirs_ = [mydir0, mydir1, mydir2, mydir3, mydir4, mydir5, mydir6, mydir7,mydir8,mydir9,mydir10, mydir11,mydir12_out,mydir13_out,mydir14_out]
     for i in range(3, 11):
         if not (os.path.exists(mydirs_[i])):
-            raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i]))
+            raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i])) #Папку Анкеты тоже проверяем.
     for i in range(0, 3):
         if not (os.path.exists(mydirs_[i])):
             try:
