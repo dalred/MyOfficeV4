@@ -157,6 +157,7 @@ def click_open(sender,event):
 def show_dialog(sender, event):
     root = Tkinter.Tk()
     root.withdraw()
+    root.attributes("-topmost", True)
     folderName = tkFileDialog.askdirectory(initialdir="/",mustexist=1,title='Пожалуйста укажите корневой каталог: ')
     if folderName:
         open.Enabled = True
@@ -184,7 +185,7 @@ worker.RunWorkerCompleted += final
 def show_form():
     formConvert.StartPosition = FormStartPosition.CenterScreen
     formConvert.ClientSize = Size(452, 245)
-    formConvert.FormBorderStyle = FormBorderStyle.FixedToolWindow
+    formConvert.FormBorderStyle = FormBorderStyle.FixedSingle
     formConvert.Name = 'formConvert'
     formConvert.BackColor = SystemColors.ButtonFace
     formConvert.Text = 'Форма для конвертации'.decode('utf8')
