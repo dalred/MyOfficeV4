@@ -86,10 +86,9 @@ def do_work(sender, event):
             except Exception:
                 raise Exception("Неудалось создать папку  "+os.path.basename(mydirs_[i]))
     if combobox1.SelectedIndex == 0:
-        foldername = textboxBrowse.Text
         for i in range(11, 15):
             if os.path.exists(mydirs_[i]):
-                dialogResult = MessageBox.Show(u"Вы хотите добавить информацию: " + os.path.basename(mydirs_[i]),
+                dialogResult = MessageBox.Show(u"Вы хотите добавить информацию в: " + os.path.basename(mydirs_[i]),
                                                u"Добавить?", MessageBoxButtons.YesNo,
                                                MessageBoxIcon.Information)
                 if dialogResult == DialogResult.Yes:
@@ -101,7 +100,7 @@ def do_work(sender, event):
                     return
             else:
                 shutil.copyfile(mydirs_[i - 4], mydirs_[i])
-        main_(sender, foldername,mydirs_,date_end)
+        main_(sender, textboxBrowse.Text,mydirs_,date_end)
     elif combobox1.SelectedIndex == 1:
         main_score(sender, mydirs_)
     elif combobox1.SelectedIndex == 2:

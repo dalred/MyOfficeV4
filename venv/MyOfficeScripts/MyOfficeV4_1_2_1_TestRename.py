@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 from dateutil.relativedelta import relativedelta
-import os, time,itertools
+import os, time,itertools,shutil
 from datetime import datetime, date
 from random import choice
 from MyOfficeSDKDocumentAPI import DocumentAPI as sdk
@@ -36,8 +36,9 @@ def clear_content():
     # Очистка содержимого ячеек с сохранением форматирования.
     print "Удаление строк."
 
-def extract_txt_doc(filename, path,folderName,mydirs_):
-    document_xls_input = application.loadDocument(path)
+def extract_txt_doc(path,folderName,mydirs_,i,lena):
+    filename=os.path.basename(path)
+    document_xls_input = application.loadDocument(path.encode('utf-8'))
     table_input = document_xls_input.getBlocks().getTable(0)
 
     last_name = table_input.getCell('C6').getRawValue()
@@ -101,7 +102,7 @@ def extract_txt_doc(filename, path,folderName,mydirs_):
     log = []
     for key, val in dict_cells.iteritems():
         if not val:
-            # Не Помечаем ошибки красным цветом в входном файле
+            # Помечаем ошибки красным цветом в входном файле
             table_input.getCell(key).setCellProperties(cell_properties)
             log = log_file(filename, key, is_first_error, log)
             is_changed = True
@@ -109,9 +110,11 @@ def extract_txt_doc(filename, path,folderName,mydirs_):
     log_file_rec(log,folderName)
 
     if is_changed:
-        document_xls_input.saveAs((mydirs_[0]+"\\"+ filename).encode('utf-8'))
-        # os.rename(root + "\\" + filename, root + "\\" + "№_000"+str(len(filtered_done) + i)+"_"+dict_str[0]+"_"+dict_str[1]+"_Обработан.xlsx")
-
+        #document_xls_input.saveAs((mydirs_[0]+"\\"+filename).encode('utf-8'))
+        document_xls_input.saveAs((mydirs_[0] + "\\"+"№_"+"_"+last_name+"_"+first_name+"_Ошибка.xlsx").encode('utf-8'))
+        os.remove(path)
+    else:
+        os.rename(path, os.path.dirname(path) + "\\" + "№_"+str(lena + i)+"_"+last_name+"_"+first_name+"_Обработан.xlsx")
     full_row_lst = [
                     last_name,
                     first_name,
@@ -168,6 +171,7 @@ def write_table(all_str_lst,worker,datetime1_end,n_rows):
             table_output_xlsx_11.getCell("H" + row_str).setText(str(difference_in_years))
         else:
             #print "Неверный формат даты, index записи: ", index
+            table_output_xlsx_11.getCell("H" + row_str).setText("Error date")
             pass
         table_output_xlsx_11.getCell("E" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
         for i in range(12, 15):
@@ -284,15 +288,15 @@ def main_(worker, folderName,mydirs_,date_end):
     application = sdk.Application()
     folder_url = mydirs_[6] #Анкеты
     for i in range(11, 15):
-        globals()['output_file_url_xls_%d' % i] = mydirs_[i].encode('utf-8')
-        globals()['document_xls_%s' % i] = application.loadDocument(mydirs_[i].encode('utf-8'))
-        globals()['table_output_xlsx_%s' % i] = (globals()['document_xls_%s' % i]).getBlocks().getTable(0)
+        globals()['output_file_url_xls_%d' % i] = mydirs_[i].encode('utf-8')                                #output path Сводный, Артек 1,2,3
+        globals()['document_xls_%s' % i] = application.loadDocument(mydirs_[i].encode('utf-8'))             #load Сводный, Артек 1,2,3
+        globals()['table_output_xlsx_%s' % i] = (globals()['document_xls_%s' % i]).getBlocks().getTable(0)  #table Сводный, Артек 1,2,3
 
     all_str_lst = []
     error_index = []
-    regex_done = '№_000.*_Обработан\.xlsx'
-    regex_not_prep = '(?<!_Обработан).xlsx'
-
+    lena=0
+    regex_done = '№_.*_Обработан\.xlsx'
+    regex_not_prep = '(?<!_Обработан).xlsx'  # Попадание в список не обработанных, далее работаем только с ними.
     for root, dirs, files in os.walk(folder_url):
         del dirs[:] # go only one level deep
         filtered_done = [i for i in files if re.search(regex_done, str(i))]
@@ -306,6 +310,8 @@ def main_(worker, folderName,mydirs_,date_end):
         return
     else:
         i = 1
+        if len(filtered_done)>0:
+            lena = int(filtered_done[len(filtered_done) - 1].split("_")[1])
         for filename in filtered_not_prep:
             percentage = (filtered_not_prep.index(filename)*91)/len(filtered_not_prep)
             # print worker.WorkerReportsProgress
@@ -318,10 +324,9 @@ def main_(worker, folderName,mydirs_,date_end):
             # except Exception as e:
             #     print e.message
             path = root + "\\"+filename
-            path = path.encode('utf8')
-            dict_str = extract_txt_doc(filename,path,folderName,mydirs_)
+            #path = path.encode('utf8')
+            dict_str = extract_txt_doc(path,folderName,mydirs_,i,lena) #folderName - textboxBrowse.Text
             all_str_lst.append(dict_str)
-            #os.rename(root + "\\" + filename, root + "\\" + "№_000"+str(len(filtered_done) + i)+"_"+dict_str[0]+"_"+dict_str[1]+"_Обработан.xlsx")
             i += 1
 
     error_files_count = 0
@@ -329,27 +334,31 @@ def main_(worker, folderName,mydirs_,date_end):
         p = len(error_index)
         for v in all_str_lst[i]:
             if not v:
-                all_str_lst.pop(i)
-                error_index.append(i + 1)
+                #all_str_lst.pop(i)
+                error_index.append(i)
         if len(error_index) > p:
             error_files_count += 1
+    index_del=set(error_index)
+    for index in sorted(index_del, reverse=True):
+        del all_str_lst[index]   #Удаление строк из списка в которых есть ошибка
     #clear_content()
     print "Количество записей с ошибками: ", len(error_index)
     print "Количество файлов с ошибками: ", error_files_count
     # Выделение строк в таблице по количеству строк из документов
     n_rows = table_output_xlsx_11.getRowsCount()
     rows_c = len(all_str_lst)
-    print "n_rows,n_rows_2rows_c= ", n_rows ,rows_c
-    if table_output_xlsx_11.getCell("A4").getRawValue()=='':
-        #Если пустая строка
-        n_rows = n_rows-1
-        rows_c=rows_c-1
-        for i in range(11, 15):
-            globals()['table_output_xlsx_%s' % i].insertRowAfter(n_rows, copyRowStyle=True, rowsCount=rows_c) #добавить в конец количство
-    else:
-        for i in range(11, 15):
-            globals()['table_output_xlsx_%s' % i].insertRowAfter(n_rows-1, copyRowStyle=True, rowsCount=rows_c)  # добавить в конец количство
+    #print "n_rows,rows_c= ", n_rows ,rows_c
+    if rows_c>0:
 
+        if table_output_xlsx_11.getCell("A4").getRawValue()=='':
+            #Если пустая строка
+            n_rows = n_rows-1
+            rows_c=rows_c-1
+            for i in range(11, 15):
+                globals()['table_output_xlsx_%s' % i].insertRowAfter(n_rows, copyRowStyle=True, rowsCount=rows_c) #добавить в конец количство
+        else:
+            for i in range(11, 15):
+                globals()['table_output_xlsx_%s' % i].insertRowAfter(n_rows-1, copyRowStyle=True, rowsCount=rows_c)  # добавить в конец количство
     number_rows = str(table_output_xlsx_11.getRowsCount())
     print "Количество строк в документе: ", number_rows
     # Записываем результат в таблицу
