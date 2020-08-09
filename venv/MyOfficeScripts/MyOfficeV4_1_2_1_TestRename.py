@@ -111,10 +111,10 @@ def extract_txt_doc(path,folderName,mydirs_,i,lena):
 
     if is_changed:
         #document_xls_input.saveAs((mydirs_[0]+"\\"+filename).encode('utf-8'))
-        document_xls_input.saveAs((mydirs_[0] + "\\"+"№_"+"_"+last_name+"_"+first_name+"_Ошибка.xlsx").encode('utf-8'))
+        document_xls_input.saveAs((mydirs_[0] + "\\"+"№_"+str(lena + i)+"_"+last_name+"_"+first_name+"_Ошибка.xlsx").encode('utf-8'))
         os.remove(path)
     else:
-        os.rename(path, os.path.dirname(path) + "\\" + "№_"+str(lena + i)+"_"+last_name+"_"+first_name+"_Обработан.xlsx")
+        os.rename(path, os.path.dirname(path) + "\\"+"№_"+str(lena + i)+"_"+last_name+"_"+first_name+"_Обработан.xlsx")
     full_row_lst = [
                     last_name,
                     first_name,
@@ -295,7 +295,7 @@ def main_(worker, folderName,mydirs_,date_end):
     all_str_lst = []
     error_index = []
     lena=0
-    regex_done = '№_.*_Обработан\.xlsx'
+    regex_done = '№_\d+.*_Обработан\.xlsx'
     regex_not_prep = '(?<!_Обработан).xlsx'  # Попадание в список не обработанных, далее работаем только с ними.
     for root, dirs, files in os.walk(folder_url):
         del dirs[:] # go only one level deep
@@ -311,7 +311,8 @@ def main_(worker, folderName,mydirs_,date_end):
     else:
         i = 1
         if len(filtered_done)>0:
-            lena = int(filtered_done[len(filtered_done) - 1].split("_")[1])
+            lena = int((filtered_done[len(filtered_done) - 1]).split("_")[1])#№ последнего
+            print "lena", lena
         for filename in filtered_not_prep:
             percentage = (filtered_not_prep.index(filename)*91)/len(filtered_not_prep)
             # print worker.WorkerReportsProgress
@@ -349,7 +350,6 @@ def main_(worker, folderName,mydirs_,date_end):
     rows_c = len(all_str_lst)
     #print "n_rows,rows_c= ", n_rows ,rows_c
     if rows_c>0:
-
         if table_output_xlsx_11.getCell("A4").getRawValue()=='':
             #Если пустая строка
             n_rows = n_rows-1
