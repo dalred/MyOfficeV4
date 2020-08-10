@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 from dateutil.relativedelta import relativedelta
-import os, time,itertools,shutil
+import os, time,itertools
 from datetime import datetime, date
 from random import choice
 from MyOfficeSDKDocumentAPI import DocumentAPI as sdk
@@ -36,7 +36,7 @@ def clear_content():
     # Очистка содержимого ячеек с сохранением форматирования.
     print "Удаление строк."
 
-def extract_txt_doc(path,folderName,mydirs_, lena):
+def extract_txt_doc(path,folderName,mydirs_,lena):
     filename=os.path.basename(path)
     document_xls_input = application.loadDocument(path.encode('utf-8'))
     table_input = document_xls_input.getBlocks().getTable(0)
@@ -117,7 +117,9 @@ def extract_txt_doc(path,folderName,mydirs_, lena):
     else:
         filename_new = str("№_" + str(lena) + "_" + last_name + "_" + first_name + "_Обработан.xlsx")
         if re.search(regex_error,str(filename)):
+            lena=int(filename.split("_")[1])
             filename_new=filename.replace("Ошибка","Обработан")
+
         os.rename(path, os.path.dirname(path) + "\\"+filename_new)
 
     full_row_lst = [
@@ -139,7 +141,9 @@ def extract_txt_doc(path,folderName,mydirs_, lena):
                     parent_fio,
                     parent_email,
                     parent_phone,
-                    parent_work]
+                    parent_work,
+                    lena]
+
     return full_row_lst
 
 
@@ -179,13 +183,14 @@ def write_table(all_str_lst,worker,datetime1_end,n_rows):
             table_output_xlsx_11.getCell("H" + row_str).setText("Error date")
             pass
         table_output_xlsx_11.getCell("E" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
+        table_output_xlsx_11.getCell("AM" + row_str).setNumber(str_[19])
         for i in range(12, 15):
             globals()['table_output_xlsx_%s' % i].getCell("B" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
 
         # A4 set text 1
         k = 1  # Начинаем с B
         #print "str", str_[0]
-        for s in str_:
+        for s in str_[:-1]:
             # print "Столбец ", column, " Строка ", row_str
             # двигаемся построчно
             if k==4 or k==6:
@@ -306,10 +311,17 @@ def main_(worker, folderName,mydirs_,date_end):
         del dirs[:] # go only one level deep
         filtered_done = [i for i in files if re.search(regex_done, str(i))] #Обработанные
         filtered_not_prep=[i for i in files  if re.search(regex_not_prep,str(i))] #Не обработанные
+    def split(s):
+        for x, y in re.findall('(\d*)(\D*)', s):
+            yield '', int(x or '0')
+            yield y, 0
+    def s(c):
+        return list(split(c))
+    filtered_done = sorted(filtered_done, key=s)
     print "Количество файлов не обработанных: ", len(filtered_not_prep)
     if len(filtered_done+filtered_not_prep)==0:
         raise Exception(u"Нет необходимых xlsx файлов в папке анкеты")
-    lena = 0
+    lena = 1
     if len(filtered_not_prep)==0:
         print "Добавление записей не требуется!"
         worker.ReportProgress(100, u"Выполнено.")
