@@ -55,7 +55,7 @@ def extract_txt_doc(path, folderName, mydirs_, lena):
     da_count = [i for i in cert if re.search("да", i)]
     if len(da_count) > 3:
         certflag = False
-    cert = [(a == 'да') * b for a, b in zip(cert, ball_list)]
+    cert_ball = [(a == 'да') * b for a, b in zip(cert, ball_list)]
 
     phone = table_input.getCell('C33').getRawValue()
     email = table_input.getCell('C35').getRawValue()
@@ -144,6 +144,7 @@ def extract_txt_doc(path, folderName, mydirs_, lena):
         parent_phone,
         parent_email,
         parent_work,
+        cert_ball,
         certflag,
         lena,
     ]
@@ -170,7 +171,7 @@ def write_table(all_str_lst, worker, datetime1_end, n_rows):
     print "Запись данных."
     worker.ReportProgress(93, u"Запись данных.")
     current_row = n_rows
-    column = list_xls("V")
+    column = list_xls("AB")
     regex_date = re.compile('^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\d\d$')  # dd-mm-yyyy
     #regex_date = re.compile('^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$')  # mm/dd/year 06/16/1990
     for str_ in all_str_lst:
@@ -185,17 +186,21 @@ def write_table(all_str_lst, worker, datetime1_end, n_rows):
             pass
         table_output_xlsx.getCell("A" + row_str).setNumber(index)
         table_output_xlsx.getCell("E" + row_str).setText(str_[0] + " " + str_[1] + " " + str_[2])
-        table_output_xlsx.getCell("AL" + row_str).setNumber(str_[20])
+        table_output_xlsx.getCell("AL" + row_str).setNumber(str_[21])
 
         # A4 set text 1
         k = 1  # Начинаем с B
         # print "str", str_[0]
-        for s in str_[:-2]:
+        for s in str_[:-3]:
             # print "Столбец ", column, " Строка ", row_str
             # двигаемся построчно
             if k == 4 or k == 6:
                 k += 1
             table_output_xlsx.getCell(column[k] + row_str).setText(s)  # column[1]-B+4 settext из лист str_
+            k += 1
+        k = 23 # Начинаем с X
+        for b in str_[19]:
+            table_output_xlsx.getCell(column[k] + row_str).setNumber(b)
             k += 1
 
         # column = chr(k+66) #Получаем из ASCII, 66 = "B"
