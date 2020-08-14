@@ -49,10 +49,13 @@ def extract_txt_doc(path, folderName, mydirs_, lena):
     cert_4 = table_input.getCell('C31').getRawValue()
     cert_5 = table_input.getCell('C32').getRawValue()
     cert = [cert_1, cert_2, cert_3, cert_4, cert_5]
-    certflag=True
-    da_count = [i for i in cert if re.search("[дД][аА]", i)]
-    if len(da_count)>3:
-        certflag=False
+    ball_list = [3, 5, 10, 5, 7]
+    cert = [re.sub(u'[Дд][Аа]', 'да', i.decode('utf8')).encode('utf8') for i in cert]
+    certflag = True
+    da_count = [i for i in cert if re.search("да", i)]
+    if len(da_count) > 3:
+        certflag = False
+    cert = [(a == 'да') * b for a, b in zip(cert, ball_list)]
 
     phone = table_input.getCell('C33').getRawValue()
     email = table_input.getCell('C35').getRawValue()
