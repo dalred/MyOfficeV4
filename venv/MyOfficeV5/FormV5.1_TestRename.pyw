@@ -4,6 +4,7 @@ import os, sys, time, inspect, clr, datetime, tkFileDialog, Tkinter, shutil
 from dateutil.relativedelta import relativedelta
 from MyOfficeV5_1_TestRename import main_
 from Results_v3_2 import main__
+from formation_judges import main_judges
 from Scores import main_score
 clr.AddReference('System')
 from System import DateTime as NetDateTime
@@ -91,7 +92,10 @@ def do_work(sender, event):
             shutil.copyfile(mydirs_[7], mydirs_[11])
         main_(sender, textboxBrowse.Text,mydirs_,str(date_end))
     elif combobox1.SelectedIndex == 1:
-        main_score(sender, mydirs_)
+        for i in range(8, 12):
+            if not (os.path.exists(mydirs_[i])):
+                raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i]))
+        main_judges(sender, mydirs_)
     elif combobox1.SelectedIndex == 2:
         main__(sender, textboxBrowse.Text,mydirs_)
 
@@ -241,7 +245,7 @@ def show_form():
     #
     combobox1.FormattingEnabled = True
     combobox1.Items.Add(u'1. Обработка Анкет')
-    combobox1.Items.Add(u'2. Подсчет балов')
+    combobox1.Items.Add(u'2.1 Формирование списков Жюри')
     combobox1.Items.Add(u'3. Формирование грамот и писем')
     combobox1.Location = Point(258, 143)
     combobox1.Name = 'combobox1'
