@@ -122,7 +122,7 @@ def extract_txt_doc(path, folderName, mydirs_, lena):
         if re.search(regex_error, str(os.path.basename(path))):
             lena = int(filename.split("_")[1])
             filename_new = filename_err.replace("Ошибка", "Обработан")
-        os.rename(path, os.path.dirname(path) + "\\" + filename_new)
+        #os.rename(path, os.path.dirname(path) + "\\" + filename_new)
 
     full_row_lst = [
         last_name,
@@ -178,7 +178,6 @@ def write_table(all_str_lst, worker, datetime1_end, n_rows):
         index = current_row - 3  # 1
         row_str = str(current_row)  # 4
         if regex_date.match(str_[3]):
-            #datetime_birth = convert_time(str_[3])
             table_output_xlsx.getCell("G" + row_str).setFormula("=TRUNC(DAYS($C$1"+",F"+ row_str+")/365.242199, 0"+ ")")
         else:
             # print "Неверный формат даты, index записи: ", index
@@ -250,13 +249,7 @@ def set_cells_format(number_rows, worker):
         c.setFormat(sdk.CellFormat_Date)
 
 
-def convert_time(date_):
-    date_str = date_.replace("/", ".").split(".")
-    mounth_str = int(date_str[0])
-    day_str = int(date_str[1])
-    year_str = int(date_str[2])
-    datetime_end = date(year_str, mounth_str, day_str)
-    return datetime_end
+
 
 
 application = None
@@ -359,8 +352,6 @@ def main_(worker, folderName, mydirs_, date_end):
     number_rows = str(table_output_xlsx.getRowsCount())
     print "Количество строк в документе: ", number_rows
     # Записываем результат в таблицу
-    # datetime1_end=convert_date(111)
-    # date_end = convert_time(date_end)
     table_output_xlsx.getCell("C1").setFormattedValue(str(date_end))
     write_table(all_str_lst, worker, date_end, n_rows)  # Массив передастся в упорядоченном виде скорее всего
     set_cells_format(number_rows, worker)

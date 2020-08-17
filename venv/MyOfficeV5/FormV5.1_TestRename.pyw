@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 from MyOfficeV5_1_TestRename import main_
 from Results_v3_2 import main__
 from formation_judges import main_judges
-from Scores import main_score
+from Scores import main_score,  write_color_win
 clr.AddReference('System')
 from System import DateTime as NetDateTime
 clr.AddReference('System.Threading.Thread')
@@ -93,11 +93,16 @@ def do_work(sender, event):
         main_(sender, textboxBrowse.Text,mydirs_,str(date_end))
     elif combobox1.SelectedIndex == 1:
         for i in range(8, 12):
-            if not (os.path.exists(mydirs_[i])):
+            if not (os.path.exists(mydirs_[i])): #проверка шаблонов
                 raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i]))
         main_judges(sender, mydirs_)
     elif combobox1.SelectedIndex == 2:
-        main__(sender, textboxBrowse.Text,mydirs_)
+        for i in range(11, 15):
+            if not (os.path.exists(mydirs_[i])):
+                raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i]))  # Жюри1,2,3 Сводный.
+        main_score(sender,mydirs_,"F",28,"AE")  #k = 28 AС до АЕ F из жюри k=32 AG
+        time.sleep(0.1)
+        write_color_win(sender, mydirs_)
 
 
 def Cancel_(sender, event):
@@ -113,7 +118,6 @@ def bgWorker_ProgressChanged(sender, event):
 
 def final(sender,event):
     if event.Error <> None:
-        print "Error: ", event.Error.Message
         MessageBox.Show(event.Error.Message,u"Обратитесь к разработчикам!!", MessageBoxButtons.OK, MessageBoxIcon.Error)
     print "RunWorkerCompleted"
     start.Enabled = True
@@ -122,9 +126,9 @@ def final(sender,event):
     Cursor.Current = Cursors.Default
     formConvert.Text = 'Задача завершена!'.decode('utf8')
     sender.Dispose()
-    time.sleep(1)
+    time.sleep(0.5)
     progressbar1.Value = 0
-    MessageBox.Show(u"Задача завершена!", u"Информация", MessageBoxButtons.OK,
+    MessageBox.Show(u"Задача: "+combobox1.SelectedItem+" завершена!", u"Информация", MessageBoxButtons.OK,
                     MessageBoxIcon.Information)
 
 
@@ -246,10 +250,10 @@ def show_form():
     combobox1.FormattingEnabled = True
     combobox1.Items.Add(u'1. Обработка Анкет')
     combobox1.Items.Add(u'2.1 Формирование списков Жюри')
-    combobox1.Items.Add(u'3. Формирование грамот и писем')
-    combobox1.Location = Point(258, 143)
+    combobox1.Items.Add(u'2.2 Формирование результатов 1-й этап')
+    combobox1.Location = Point(228, 143)
     combobox1.Name = 'combobox1'
-    combobox1.Size = Size(185, 21)
+    combobox1.Size = Size(215, 21)
     combobox1.TabIndex = 2
     combobox1.SelectedIndex=0
     combobox1.DropDownStyle = ComboBoxStyle.DropDownList
@@ -309,7 +313,6 @@ def show_form():
     datetimepicker1.Size = Size(183, 20)
     datetimepicker1.TabIndex = 10
     datetimepicker1.Value=NetDateTime(2021, 01, 19)
-
     #
     # ControlsAdd
     formConvert.BringToFront()

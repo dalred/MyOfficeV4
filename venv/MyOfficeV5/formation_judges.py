@@ -2,13 +2,23 @@
 from MyOfficeSDKDocumentAPI import DocumentAPI as sdk
 import inspect, os
 
+application = sdk.Application()
+
+
+
+def load_doc(mydirs_):
+    input_file_url_xls = mydirs_.encode('utf-8')  # Output с размещением системы рейтингования
+    document_xls = application.loadDocument(input_file_url_xls)  # load Сводный
+    table_output_xlsx = document_xls.getBlocks().getTable(0)  # table Сводный
+    return table_output_xlsx,document_xls
+
 
 def write_formules(row_str,fio_list,table_output2_xlsx,table_output_xlsx,mydirs_,worker):
     worker.ReportProgress(10, u"Формирование файлов Жюри")
     current_row = 4 # c index 4
     for str_ in fio_list:
         index = current_row - 3
-        percentage = (index * 100) / len(fio_list)
+        percentage = (index * 95) / len(fio_list)
         worker.ReportProgress(percentage, u"Формирование файлов Жюри")
         row_str = str(current_row)
         table_output2_xlsx.getCell("B" + row_str).setText(str_)
@@ -23,15 +33,8 @@ def write_formules(row_str,fio_list,table_output2_xlsx,table_output_xlsx,mydirs_
 
 def main_judges(worker,mydirs_):
     worker.ReportProgress(0, u"Формирование файлов Жюри")
-    application = sdk.Application()
-    input_file_url_xls = mydirs_[11].encode('utf-8')  # Output с размещением системы рейтингования
-    document_xls = application.loadDocument(input_file_url_xls)  # load Сводный
-    table_output_xlsx = document_xls.getBlocks().getTable(0)  # table Сводный
-
-    input_file_url2_xls = mydirs_[8].encode('utf-8')  # intput с Жюри1
-    document2_xls = application.loadDocument(input_file_url2_xls)  # load Жюри1
-    table_output2_xlsx = document2_xls.getBlocks().getTable(0)  # table Жюри1
-
+    table_output_xlsx,document_xls =load_doc(mydirs_[11])
+    table_output2_xlsx,document2_xls=load_doc(mydirs_[8])
     row_str = table_output_xlsx.getRowsCount()  # количество строк
     E4_empty = table_output_xlsx.getCell("E4").getRawValue() == ''
 
