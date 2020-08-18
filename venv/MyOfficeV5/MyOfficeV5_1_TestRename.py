@@ -259,7 +259,6 @@ def main_(worker, folderName, mydirs_, date_end):
     global application, table_output_xlsx
     application = sdk.Application()
     folder_url = mydirs_[6]  # Анкеты
-    output_file_url_xls = mydirs_[11].encode('utf-8')  # Output с размещением системы рейтингования
     document_xls = application.loadDocument(mydirs_[11].encode('utf-8'))  # load Сводный
     table_output_xlsx = document_xls.getBlocks().getTable(0)  # table Сводный
     all_str_lst = []
@@ -356,6 +355,9 @@ def main_(worker, folderName, mydirs_, date_end):
     set_cells_format(number_rows, worker)
     # error_data(error_index, worker)
     worker.ReportProgress(99, u"Сохранение XLSX.")
-    document_xls.saveAs(output_file_url_xls)
+    try:
+        document_xls.saveAs(mydirs_[11].encode('utf-8'))
+    except Exception as e:
+        raise Exception(u"Открыт документ: " + os.path.basename(mydirs_[11]))
     # raise Exception('This is the exception you expect to handle') #Аналог Throw для обработки исключений
     worker.ReportProgress(100, u"Готово.")

@@ -47,7 +47,10 @@ def write_color_win(worker,mydirs_):
                 globals()['cell_range_%s' % i].setCellProperties(cell_properties)
             cell_range.setCellProperties(cell_properties)
     for i in range(1, 5):
-        globals()['document_xls_%s' % i].saveAs(mydirs_[i+10].encode('utf-8'))
+        try:
+            globals()['document_xls_%s' % i].saveAs(mydirs_[i+10].encode('utf-8'))
+        except Exception as e:
+            raise Exception(u"Открыт документ: " + os.path.basename(mydirs_[i+10]))
     worker.ReportProgress(100, u"Завершено")
 
 def write_scores(col,scores_,table_output_xlsx_main):
@@ -78,7 +81,10 @@ def main_score(worker,mydirs_,adr,k,adr_last,proc):
         write_scores(column[k + j], scores_, table_output_xlsx_main) #Сохранение в сводный по трем файлам, в цикле
         j += 1
         worker.ReportProgress(30*j, u"Экспорт балов.")
-    document_xls_main.saveAs(mydirs_[11].encode('utf8'))
+    try:
+        document_xls_main.saveAs(mydirs_[11].encode('utf8'))
+    except Exception as e:
+        raise Exception(u"Открыт документ: " + os.path.basename(mydirs_[11]))
     worker.ReportProgress(proc, u"Экспорт завершен.")
 
 

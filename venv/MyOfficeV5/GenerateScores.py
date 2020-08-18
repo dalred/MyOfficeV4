@@ -92,8 +92,8 @@ column = list_xls("AL")
 k=29 #AD AH 33
 j=0 #Смещение вправо
 for i in range(12, 15):
-    #generate_scores(mydirs_[i])
-    generate_scores2(mydirs_[i])
+    generate_scores(mydirs_[i])
+    #generate_scores2(mydirs_[i])
     #scores_1,scores_2=get_scores(mydirs_[i])
     #write_scores(column[k+j],column[k+4+j], scores_1, scores_2)
     j+=1
