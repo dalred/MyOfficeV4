@@ -39,6 +39,8 @@ mydirs_ = [mydir0, mydir1, mydir2, mydir3, mydir4, mydir5, mydir6, mydir7,mydir8
 
 global application
 application = sdk.Application()
+cell_properties = sdk.CellProperties()
+cell_properties.backgroundColor = sdk.ColorRGBA(193, 242, 17, 255)
 
 def iter_all_strings():
     for size in itertools.count(1):
@@ -68,10 +70,19 @@ def generate_scores(mydir):
         table_output_xlsx.getCell("C"+ str(i)).setNumber(choice(scores_))
         table_output_xlsx.getCell("D" + str(i)).setNumber(choice(scores_))
         table_output_xlsx.getCell("E" + str(i)).setNumber(choice(scores_))
-        """table_output_xlsx.getCell("G" + str(i)).setNumber(choice(scores__))
-        table_output_xlsx.getCell("H" + str(i)).setNumber(choice(scores__))
-        table_output_xlsx.getCell("I" + str(i)).setNumber(choice(scores__))
-        table_output_xlsx.getCell("J" + str(i)).setNumber(choice(scores__))"""
+    document_xls.saveAs(mydir.encode('utf8'))
+
+def generate_scores2(mydir):
+    document_xls = application.loadDocument(mydir.encode('utf8'))
+    table_output_xlsx = document_xls.getBlocks().getTable(0)
+    n_rows = table_output_xlsx.getRowsCount()
+    for i in range(4, n_rows + 1):
+       if table_output_xlsx.getCell("A" + str(i)).getCellProperties().backgroundColor.__eq__(cell_properties.backgroundColor):
+                table_output_xlsx.getCell("A" + str(i)).setNumber(choice(scores__))
+                table_output_xlsx.getCell("G" + str(i)).setNumber(choice(scores__))
+                table_output_xlsx.getCell("H" + str(i)).setNumber(choice(scores__))
+                table_output_xlsx.getCell("I" + str(i)).setNumber(choice(scores__))
+                table_output_xlsx.getCell("J" + str(i)).setNumber(choice(scores__))
     document_xls.saveAs(mydir.encode('utf8'))
 
 
@@ -81,7 +92,8 @@ column = list_xls("AL")
 k=29 #AD AH 33
 j=0 #Смещение вправо
 for i in range(12, 15):
-    generate_scores(mydirs_[i])
+    #generate_scores(mydirs_[i])
+    generate_scores2(mydirs_[i])
     #scores_1,scores_2=get_scores(mydirs_[i])
     #write_scores(column[k+j],column[k+4+j], scores_1, scores_2)
     j+=1

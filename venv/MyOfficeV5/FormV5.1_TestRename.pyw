@@ -92,6 +92,18 @@ def do_work(sender, event):
             shutil.copyfile(mydirs_[7], mydirs_[11])
         main_(sender, textboxBrowse.Text,mydirs_,str(date_end))
     elif combobox1.SelectedIndex == 1:
+        for i in range(12, 15):
+            if os.path.exists(mydirs_[i]):
+                dialog_result = MessageBox.Show(u"Вы хотите перезаписать информацию в: " + os.path.basename(mydirs_[i]),
+                                                u"Перзаписать?", MessageBoxButtons.YesNo,
+                                                MessageBoxIcon.Information)
+                if dialog_result == DialogResult.Yes:
+                    pass
+                elif dialog_result == DialogResult.No:
+                    # raise Exception("")
+                    sender.CancelAsync()
+                    sender.Dispose()
+                    return
         for i in range(8, 12):
             if not (os.path.exists(mydirs_[i])): #проверка шаблонов
                 raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i]))
@@ -100,9 +112,15 @@ def do_work(sender, event):
         for i in range(11, 15):
             if not (os.path.exists(mydirs_[i])):
                 raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i]))  # Жюри1,2,3 Сводный.
-        main_score(sender,mydirs_,"F",28,"AE")  #k = 28 AС до АЕ F из жюри k=32 AG
+        main_score(sender,mydirs_,"F",28,"AE",90)  #k = 28 AС до АЕ F из жюри k=32 AG
         time.sleep(0.1)
         write_color_win(sender, mydirs_)
+    elif combobox1.SelectedIndex == 3:
+        for i in range(11, 15):
+            if not (os.path.exists(mydirs_[i])):
+                raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i]))  # Жюри1,2,3 Сводный.
+        main_score(sender, mydirs_, "K", 32, "AI",100)
+
 
 
 def Cancel_(sender, event):
@@ -144,6 +162,9 @@ def begin_dfile(sender, event):
         worker.RunWorkerAsync()
         Application.UseWaitCursor = True
     elif combobox1.SelectedIndex == 2 and state_dir is True:
+        worker.RunWorkerAsync()
+        Application.UseWaitCursor = True
+    elif combobox1.SelectedIndex == 3 and state_dir is True:
         worker.RunWorkerAsync()
         Application.UseWaitCursor = True
 
@@ -251,6 +272,7 @@ def show_form():
     combobox1.Items.Add(u'1. Обработка Анкет')
     combobox1.Items.Add(u'2.1 Формирование списков Жюри')
     combobox1.Items.Add(u'2.2 Формирование результатов 1-й этап')
+    combobox1.Items.Add(u'2.3 Формирование результатов 2-й этап')
     combobox1.Location = Point(228, 143)
     combobox1.Name = 'combobox1'
     combobox1.Size = Size(215, 21)

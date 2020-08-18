@@ -9,7 +9,7 @@ from string import ascii_uppercase
 global application
 application = sdk.Application()
 cell_properties = sdk.CellProperties()
-cell_properties.backgroundColor = sdk.ColorRGBA(193, 242, 17, 1)
+cell_properties.backgroundColor = sdk.ColorRGBA(193, 242, 17, 255)
 
 def iter_all_strings():
     for size in itertools.count(1):
@@ -40,7 +40,7 @@ def write_color_win(worker,mydirs_):
     for i in range(4, n_rows + 1):
         n_rows = str(i)
         if float(table_output_xlsx_1.getCell("W" + n_rows).getFormattedValue()) > 10:
-            cell_range = table_output_xlsx_1.getCellRange("B" + n_rows + ":AE" + n_rows)
+            cell_range = table_output_xlsx_1.getCellRange("B" + n_rows + ":AJ" + n_rows)
             for i in range(1, 5):
                 globals()['cell_range_%s' % i] = globals()['table_output_xlsx_%s' % i].getCellRange(
                     "A" + n_rows + ":F" + n_rows)
@@ -67,7 +67,7 @@ def get_scores(table_output_xlsx,adr):
 
 
 
-def main_score(worker,mydirs_,adr,k,adr_last):
+def main_score(worker,mydirs_,adr,k,adr_last,proc):
     table_output_xlsx_main, document_xls_main = load_doc(mydirs_[11])
     worker.ReportProgress(0, u"Экспорт балов.")
     column = list_xls(str(adr_last))
@@ -79,5 +79,6 @@ def main_score(worker,mydirs_,adr,k,adr_last):
         j += 1
         worker.ReportProgress(30*j, u"Экспорт балов.")
     document_xls_main.saveAs(mydirs_[11].encode('utf8'))
-    worker.ReportProgress(90, u"Экспорт завершен.")
+    worker.ReportProgress(proc, u"Экспорт завершен.")
+
 

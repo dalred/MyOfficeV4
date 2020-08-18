@@ -219,11 +219,10 @@ def error_data(data_error, worker):  # Раскрашивает в выходн�
 
 
 def set_cells_format(number_rows, worker):
-    # Покраска зеленым
     print "Применение форматирования."
     worker.ReportProgress(94, u"Применение форматирования.")
     cell_properties = sdk.CellProperties()
-    cell_properties.backgroundColor = sdk.ColorRGBA(146, 208, 80, 1)
+    cell_properties.backgroundColor = sdk.ColorRGBA(146, 208, 80, 1)  # Покраска зеленым
     # cell_properties.verticalAlignment = sdk.VerticalAlignment_Center
     # Задаем диапозон B4:S - конечная строка
     # Применение форматирования B4:S - конечная строка
