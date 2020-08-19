@@ -50,12 +50,17 @@ def extract_txt_doc(path, folderName, mydirs_, lena):
     cert_5 = table_input.getCell('C32').getRawValue()
     cert = [cert_1, cert_2, cert_3, cert_4, cert_5]
     ball_list = [3, 5, 10, 5, 7]
-    cert = [re.sub(u'[Дд][Аа]', 'да', i.decode('utf8')).encode('utf8') for i in cert]
+    cert = [re.sub(u'[Дд][Аа]', 'Да', i.decode('utf8')).encode('utf8') for i in cert]
+    cert = [re.sub(u'[Нн][Ее][Тт]', 'Нет', i.decode('utf8')).encode('utf8') for i in cert]
+    diplom_list = ["Диплом 1 степени", "Диплом 2 степени", "Диплом 3 степени", "Диплом Почтового комиссара",
+                   'Диплом "Наставника"']
+    cert_list = [a if a == "Нет" else b for a, b in zip(cert, diplom_list)] #Для того чтобы написать в сводном
+                                                                                # файле название диплома или нет
     certflag = True
-    da_count = [i for i in cert if re.search("да", i)]
+    da_count = [i for i in cert if re.search("Да", i)]
     if len(da_count) > 3:
         certflag = False
-    cert_ball = [(a == 'да') * b for a, b in zip(cert, ball_list)]
+    cert_ball = [(a == 'Да') * b for a, b in zip(cert, ball_list)]
 
     phone = table_input.getCell('C33').getRawValue()
     email = table_input.getCell('C35').getRawValue()
@@ -120,9 +125,9 @@ def extract_txt_doc(path, folderName, mydirs_, lena):
     else:
         filename_new = str(filename+ "_Обработан.xlsx")
         if re.search(regex_error, str(os.path.basename(path))):
-            lena = int(filename.split("_")[1])
-            filename_new = filename_err.replace("Ошибка", "Обработан")
-        #os.rename(path, os.path.dirname(path) + "\\" + filename_new)
+            lena = int(os.path.basename(path).split("_")[1])
+            filename_new = str(os.path.basename(path)).replace("Ошибка", "Обработан")
+        os.rename(path, os.path.dirname(path) + "\\" + filename_new)
 
     full_row_lst = [
         last_name,
@@ -137,7 +142,7 @@ def extract_txt_doc(path, folderName, mydirs_, lena):
         school,
         school_address,
         exp,
-        cert_1 + ", " + cert_2 + ", " + cert_3 + ", " + cert_4 + ", " + cert_5,
+        cert_list[0] + ", " + cert_list[1] + ", " + cert_list[2] + ", " + cert_list[3] + ", " + cert_list[4],
         phone,
         email,
         parent_fio,
