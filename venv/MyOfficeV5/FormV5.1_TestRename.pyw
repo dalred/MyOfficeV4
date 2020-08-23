@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from re import compile
 import os, sys, time, inspect, clr, datetime, tkFileDialog, Tkinter, shutil
 from dateutil.relativedelta import relativedelta
 from MyOfficeV5_1_TestRename import main_
-from Results_v3_2 import main__
+from Results_v3_3 import main_results
 from formation_judges import main_judges
 from Scores import main_score,  write_color_win
 clr.AddReference('System')
@@ -26,6 +25,7 @@ formConvert = Form()
 progressbar1 = ProgressBar()
 combobox1 = ComboBox()
 textboxBrowse = TextBox()
+textboxCount = TextBox()
 start = Button()
 canceling = Button()
 worker = BackgroundWorker()
@@ -120,7 +120,30 @@ def do_work(sender, event):
             if not (os.path.exists(mydirs_[i])):
                 raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i]))  # Жюри1,2,3 Сводный.
         main_score(sender, mydirs_, "K", 32, "AI",100)
+    elif combobox1.SelectedIndex == 4:
+        for i in range(11, 15):
+            if not (os.path.exists(mydirs_[i])):
+                raise Exception("Отсутствует:  " + os.path.abspath(mydirs_[i]))  # Жюри1,2,3 Сводный.
+        for i in range(1, 3):
+            if not (os.path.exists(mydirs_[i])):
+                try:
+                    os.mkdir(mydirs_[i], 0o777)  # Папка Результаты,Грамоты
+                    MessageBox.Show(u"Создана папка: " + os.path.basename(mydirs_[i]), u"Информация", MessageBoxButtons.OK,
+                                    MessageBoxIcon.Information)
+                except Exception:
+                    raise Exception("Неудалось создать папку:" + os.path.basename(mydirs_[i]))
+        count = int(textboxCount.Text)
+        main_results(worker, mydirs_,count)
 
+def ComboBox1_SelectedIndexChanged(sender,event):
+    if sender.SelectedIndex!= 0:
+        datetimepicker1.Enabled = False
+    else:
+        datetimepicker1.Enabled=True
+    if sender.SelectedIndex==4:
+        textboxCount.ReadOnly=False
+    else:
+        textboxCount.ReadOnly = True
 
 
 def Cancel_(sender, event):
@@ -165,6 +188,9 @@ def begin_dfile(sender, event):
         worker.RunWorkerAsync()
         Application.UseWaitCursor = True
     elif combobox1.SelectedIndex == 3 and state_dir is True:
+        worker.RunWorkerAsync()
+        Application.UseWaitCursor = True
+    elif combobox1.SelectedIndex == 4 and state_dir is True:
         worker.RunWorkerAsync()
         Application.UseWaitCursor = True
 
@@ -273,11 +299,13 @@ def show_form():
     combobox1.Items.Add(u'2.1 Формирование списков Жюри')
     combobox1.Items.Add(u'2.2 Формирование результатов 1-й этап')
     combobox1.Items.Add(u'2.3 Формирование результатов 2-й этап')
+    combobox1.Items.Add(u'3.1 Формирование грамот и писем')
     combobox1.Location = Point(228, 143)
     combobox1.Name = 'combobox1'
     combobox1.Size = Size(215, 21)
     combobox1.TabIndex = 2
     combobox1.SelectedIndex=0
+    combobox1.SelectedIndexChanged+=ComboBox1_SelectedIndexChanged
     combobox1.DropDownStyle = ComboBoxStyle.DropDownList
     #combobox1.SelectedIndexChanged += SelectedIndexChanged
     #
@@ -290,6 +318,16 @@ def show_form():
     label.Text = u'Этап обработки'
     label.TextAlign = ContentAlignment.MiddleLeft
     label.UseCompatibleTextRendering = True
+    #
+    # label Этап
+    label_count = Label()
+    label_count.Location = Point(230, 53)
+    label_count.Name = 'label'
+    label_count.Size = Size(43, 20)
+    label_count.TabIndex = 3
+    label_count.Text = u'Квота: '
+    label_count.TextAlign = ContentAlignment.MiddleLeft
+    label_count.UseCompatibleTextRendering = True
     #
     #Путь к размещению файлов
     label1 = Label()
@@ -316,6 +354,13 @@ def show_form():
     textboxBrowse.Multiline = True
     textboxBrowse.TabIndex = 6
     textboxBrowse.ReadOnly = True
+    # TextBox Квота
+    textboxCount.Location = Point(279, 53)
+    textboxCount.Name = 'textboxBrowse'
+    textboxCount.Size = Size(83, 20)
+    textboxCount.Multiline = False
+    textboxCount.ReadOnly = True
+    textboxCount.Text="200"
     #
     #picturebox
     picturebox1=PictureBox()
@@ -351,6 +396,8 @@ def show_form():
     formConvert.Controls.Add(datetimepicker1)
     formConvert.Controls.Add(picturebox1)
     formConvert.Controls.Add(open)
+    formConvert.Controls.Add(label_count)
+    formConvert.Controls.Add(textboxCount)
     Application.Run(formConvert)
 
 

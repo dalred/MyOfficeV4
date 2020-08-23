@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from re import compile
-import os, time,itertools,inspect
+import os, time,itertools,inspect,re
 from random import choice
 from datetime import datetime,timedelta,date
 from MyOfficeSDKDocumentAPI import DocumentAPI as sdk
@@ -93,8 +92,13 @@ k=29 #AD AH 33
 j=0 #Смещение вправо
 for i in range(12, 15):
     #generate_scores(mydirs_[i])
-    generate_scores2(mydirs_[i])
+    #generate_scores2(mydirs_[i])
     #scores_1,scores_2=get_scores(mydirs_[i])
     #write_scores(column[k+j],column[k+4+j], scores_1, scores_2)
     j+=1
+
+regex_count = '^\d+$'
+count=200
+if not re.search(regex_count, str(count)):
+    print "hello"
 

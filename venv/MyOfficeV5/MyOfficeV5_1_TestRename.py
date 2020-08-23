@@ -223,32 +223,19 @@ def error_data(data_error, worker):  # Раскрашивает в выходн�
         cell_range.setCellProperties(cell_properties)
 
 
-def set_cells_format(number_rows, worker):
+def set_cells_format(number_rows, worker,n_rows):
+    current_row = n_rows
+    row_str = str(current_row)
     print "Применение форматирования."
     worker.ReportProgress(94, u"Применение форматирования.")
-    cell_properties = sdk.CellProperties()
-    cell_properties.backgroundColor = sdk.ColorRGBA(146, 208, 80, 1)  # Покраска зеленым
-    # cell_properties.verticalAlignment = sdk.VerticalAlignment_Center
-    # Задаем диапозон B4:S - конечная строка
-    # Применение форматирования B4:S - конечная строка
-    worker.ReportProgress(95, u"Применение форматирования для диапозона B4:V" + number_rows)
-    cell_range = table_output_xlsx.getCellRange("B4:V" + number_rows)
-    cell_range.setCellProperties(cell_properties)
-
-    # Задаем вертикальное центрирование
-    # для диапозона А4-А - конечная строка.
-    worker.ReportProgress(96, u"Применение форматирования для диапозона А4:А" + number_rows)
-    cell_properties_aligment = sdk.CellProperties()
-    cell_properties_aligment.backgroundColor = sdk.ColorRGBA(0, 0, 0, 0)
-    cell_properties_aligment.verticalAlignment = sdk.VerticalAlignment_Center
-    cell_range_aligment = table_output_xlsx.getCellRange("A4:A" + number_rows)
+    """cell_range_aligment = table_output_xlsx.getCellRange("A"+row_str+":A" + number_rows)
     for c in cell_range_aligment:
-        c.setCellProperties(cell_properties_aligment)
+        c.setCellProperties(cell_properties_aligment)"""
     # cell_range_aligment.setCellProperties(cell_properties_aligment) Баг-репорт
 
     # Формат Date для столбца E4 потому что SDK тупит
-    worker.ReportProgress(97, u"Формат Date для столбца E4")
-    cell_range_date = table_output_xlsx.getCellRange("F4:F" + number_rows)
+    worker.ReportProgress(97, u"Формат Date для столбца F4")
+    cell_range_date = table_output_xlsx.getCellRange("F"+row_str+":F" + number_rows)
     for c in cell_range_date:
         c.setFormat(sdk.CellFormat_Date)
 
@@ -357,7 +344,7 @@ def main_(worker, folderName, mydirs_, date_end):
     # Записываем результат в таблицу
     table_output_xlsx.getCell("C1").setFormattedValue(str(date_end))
     write_table(all_str_lst, worker, date_end, n_rows)  # Массив передастся в упорядоченном виде скорее всего
-    set_cells_format(number_rows, worker)
+    set_cells_format(number_rows, worker,n_rows)
     # error_data(error_index, worker)
     worker.ReportProgress(99, u"Сохранение XLSX.")
     try:

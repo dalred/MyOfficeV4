@@ -124,17 +124,17 @@ year="01.01."
 last_names_F=[i+'а' for i in last_names_M]
 
 
-for i in range(1,16):
+for i in range(1,301):
     sex_list = choice(sex)
     date_ = year + str(choice(range(1999, 2010)))
     if sex_list == "F":
-        table_output_xlsx.getCell("C6").setText(choice(first_names_F))
-        table_output_xlsx.getCell("C8").setText(choice(last_names_F))
+        table_output_xlsx.getCell("C8").setText(choice(first_names_F))
+        table_output_xlsx.getCell("C6").setText(choice(last_names_F))
         table_output_xlsx.getCell("C10").setText(choice(middle_name_F))
         table_output_xlsx.getCell("C12").setFormattedValue(date_)
     else:
-        table_output_xlsx.getCell("C6").setText(choice(first_names_M))
-        table_output_xlsx.getCell("C8").setText(choice(last_names_M))
+        table_output_xlsx.getCell("C8").setText(choice(first_names_M))
+        table_output_xlsx.getCell("C6").setText(choice(last_names_M))
         table_output_xlsx.getCell("C10").setText(choice(middle_name_M))
         table_output_xlsx.getCell("C12").setFormattedValue(date_)
     table_output_xlsx.getCell("C28").setText(choice(["Да","Нет"]))

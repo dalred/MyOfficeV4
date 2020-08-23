@@ -33,7 +33,7 @@ def load_doc(mydirs_):
 
 
 def write_color_win(worker,mydirs_):
-    worker.ReportProgress(91, u"Выделение победителя первого этапа")
+    worker.ReportProgress(91, u"Выделение победителей первого этапа")
     for i in range(1, 5):
         globals()['table_output_xlsx_%d' % i],globals()['document_xls_%d' % i] =load_doc(mydirs_[i+10].encode('utf-8'))
     n_rows = table_output_xlsx_1.getRowsCount()
