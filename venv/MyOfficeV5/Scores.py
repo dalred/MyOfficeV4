@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os, time,itertools
-from random import choice
 from datetime import datetime
 from MyOfficeSDKDocumentAPI import DocumentAPI as sdk
 from string import ascii_uppercase
@@ -8,8 +7,22 @@ from string import ascii_uppercase
 
 global application
 application = sdk.Application()
-cell_properties = sdk.CellProperties()
-cell_properties.backgroundColor = sdk.ColorRGBA(193, 242, 17, 255)
+cell_properties_win = sdk.CellProperties()
+cell_properties_win.backgroundColor = sdk.ColorRGBA(193, 242, 17, 255)
+cell_properties_lose = sdk.CellProperties()
+cell_properties_lose.backgroundColor = sdk.ColorRGBA(108, 122, 137, 255)
+
+
+def message(table_input, i,template,mydirs_):
+    document = application.loadDocument(template)
+    bookmarks = document.getBookmarks()
+    last_name = table_input.getCell("B" + str(i)).getFormattedValue()
+    first_name = table_input.getCell("C" + str(i)).getFormattedValue()
+    bookmarks.getBookmarkRange('name').replaceText(last_name + ' ' + first_name)
+    f_path = (mydirs_[17] + "\\" + '№' + str(i - 3) + ' ' + last_name + ' ' + first_name + ' ' + os.path.basename(
+            template)).encode('utf-8')
+    document.saveAs((f_path))
+
 
 def iter_all_strings():
     for size in itertools.count(1):
@@ -33,19 +46,25 @@ def load_doc(mydirs_):
 
 
 def write_color_win(worker,mydirs_):
+    template_win = mydirs_[16].encode('utf-8')
+    template_lose = mydirs_[15].encode('utf-8')
     worker.ReportProgress(91, u"Выделение победителей первого этапа")
     for i in range(1, 5):
         globals()['table_output_xlsx_%d' % i],globals()['document_xls_%d' % i] =load_doc(mydirs_[i+10].encode('utf-8'))
     n_rows = table_output_xlsx_1.getRowsCount()
     for i in range(4, n_rows + 1):
         n_rows = str(i)
+        cell_range = table_output_xlsx_1.getCellRange("A" + n_rows + ":AK" + n_rows)
         if float(table_output_xlsx_1.getCell("W" + n_rows).getFormattedValue()) > 10:
-            cell_range = table_output_xlsx_1.getCellRange("B" + n_rows + ":AJ" + n_rows)
+            message(table_output_xlsx_1, i,template_win,mydirs_)
             for i in range(1, 5):
                 globals()['cell_range_%s' % i] = globals()['table_output_xlsx_%s' % i].getCellRange(
                     "A" + n_rows + ":F" + n_rows)
-                globals()['cell_range_%s' % i].setCellProperties(cell_properties)
-            cell_range.setCellProperties(cell_properties)
+                globals()['cell_range_%s' % i].setCellProperties(cell_properties_win)
+            cell_range.setCellProperties(cell_properties_win)
+        else:
+            message(table_output_xlsx_1, i,template_lose,mydirs_)
+            cell_range.setCellProperties(cell_properties_lose)
     for i in range(1, 5):
         try:
             globals()['document_xls_%s' % i].saveAs(mydirs_[i+10].encode('utf-8'))
