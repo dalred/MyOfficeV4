@@ -16,7 +16,7 @@ def main_results(worker, mydirs_):
     def message(table_input, i, mydirs_, int_status):
         last_name = table_input.getCell("B" + str(i)).getRawValue()
         first_name = table_input.getCell("C" + str(i)).getRawValue()
-        if int_status==1:
+        if int_status==1: #Победитель
             cast=table_input.getCell("AL" + str(i)).getRawValue()
             date_begin = table_input.getCell("AM" + str(i)).getRawValue()
             date_last = table_input.getCell("AN" + str(i)).getRawValue()
@@ -27,16 +27,16 @@ def main_results(worker, mydirs_):
             bookmarks_win.getBookmarkRange('date_last').replaceText(date_last)
             bookmarks_win.getBookmarkRange('date').replaceText(date)
             f_path = (mydirs_[1] + "\\" + '№' + str(i - 3) + ' ' + last_name + ' ' + first_name + ' ' + os.path.basename(
-                mydirs_[4])).encode('utf-8')
+                mydirs_[20])).encode('utf-8')
             document_win.saveAs((f_path))
-        elif int_status == 2:
+        elif int_status == 2: #Не прошел
             scores = table_input.getCell("AJ" + str(i)).getFormattedValue()
             bookmarks_lose.getBookmarkRange('name').replaceText(last_name + ' ' + first_name)
             bookmarks_lose.getBookmarkRange('scores').replaceText(scores)
             f_path = (mydirs_[1] + "\\" + '№' + str(i - 3) + ' ' + last_name + ' ' + first_name + ' ' + os.path.basename(
-                mydirs_[5])).encode('utf-8')
+                mydirs_[21])).encode('utf-8')
             document_lose.saveAs((f_path))
-        elif int_status == 3:
+        elif int_status == 3: #Резерв
             scores = table_input.getCell("AJ" + str(i)).getFormattedValue()
             number_pos = table_input.getCell("AP" + str(i)).getRawValue()
             date_ = table_input.getCell("AQ" + str(i)).getRawValue()
@@ -45,7 +45,7 @@ def main_results(worker, mydirs_):
             bookmarks_reserve.getBookmarkRange('number').replaceText(number_pos)
             bookmarks_reserve.getBookmarkRange('date').replaceText(date_)
             f_path = (mydirs_[1] + "\\" + '№' + str(i - 3) + ' ' + last_name + ' ' + first_name + ' ' + os.path.basename(
-                mydirs_[18])).encode('utf-8')
+                mydirs_[19])).encode('utf-8')
             document_reserve.saveAs((f_path))
 
 
@@ -89,14 +89,14 @@ def main_results(worker, mydirs_):
             worker.ReportProgress(percentage, u"Отмена задания")
             time.sleep(1)
             return
-        if all_scores > 10 and status=='Победитель':
+        if all_scores >= 10 and re.search('[Пп]обедитель',status):
             int_status=1
             message(table_output_xlsx_main, i, mydirs_, int_status)
             paper_win(table_output_xlsx_main, i,mydirs_)
-        elif all_scores > 10 and status=='Не прошел':
+        elif all_scores >= 10 and re.search('[Нн]е прошел',status):
             int_status = 2
             message(table_output_xlsx_main, i, mydirs_, int_status)
-        elif status=='Резерв':
+        elif re.search('[Рр]езерв',status):
             int_status = 3
             message(table_output_xlsx_main, i, mydirs_, int_status)
 

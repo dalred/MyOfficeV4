@@ -55,7 +55,7 @@ def write_color_win(worker,mydirs_):
     for i in range(4, n_rows + 1):
         n_rows = str(i)
         cell_range = table_output_xlsx_1.getCellRange("A" + n_rows + ":AK" + n_rows)
-        if float(table_output_xlsx_1.getCell("W" + n_rows).getFormattedValue()) > 10:
+        if float(table_output_xlsx_1.getCell("W" + n_rows).getFormattedValue()) >= 10:
             message(table_output_xlsx_1, i,template_win,mydirs_)
             for i in range(1, 5):
                 globals()['cell_range_%s' % i] = globals()['table_output_xlsx_%s' % i].getCellRange(
